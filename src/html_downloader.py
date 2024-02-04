@@ -43,7 +43,8 @@ for anchorTag in anchorTags:
     }
 
     fileName = queryItem + '-' + pageNum
+
 # Making GET request to each 'href' and saving the response(html files) in html folder
     with open(f"html/{fileName}.html", 'w') as f:
-        resp = requests.get(scraperUrl, params=getParam )
+        resp = requests.get(scraperUrl, params=getParam)
         f.write(resp.text)
