@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+from tqdm import tqdm
 from bs4 import BeautifulSoup
 
 # Loading Environment Variables from '.env' file in current environment
@@ -32,8 +33,14 @@ anchorTags = soup.find_all('a', class_="ge-49M", limit=10)
 # Extracted the name of the Query Item 
 queryItem = endpointWithQuery.split('=')[-1].replace('+','-')
 
+# Make sure the "html" directory exists or create it
+os.makedirs("html", exist_ok=True)
+
+print('\n')
+
 # Extracting the 'hrefs' from these anchor tags by looping through each anchor tag
-for anchorTag in anchorTags:
+# Using tqdm for progess bar
+for anchorTag in tqdm(anchorTags, desc="Downloading HTML pages"):
     link = anchorTag.get('href')
     pageNum = link.split('&')[-1].split('=')[0] + link.split('&')[-1].split('=')[-1] 
 
@@ -44,7 +51,10 @@ for anchorTag in anchorTags:
 
     fileName = queryItem + '-' + pageNum
 
-# Making GET request to each 'href' and saving the response(html files) in html folder
+# Making GET request to each 'href' and saving the response(html files) in html folder by prettifying it with beautiful soup
     with open(f"html/{fileName}.html", 'w') as f:
         resp = requests.get(scraperUrl, params=getParam)
-        f.write(resp.text)
+        soup = BeautifulSoup(resp.content, 'html.parser')
+        f.write(soup.prettify())
+        
+print('\n')
